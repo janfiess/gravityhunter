@@ -106,7 +106,7 @@ public class JSONio06 : MonoBehaviour {
 		File.WriteAllText(Application.dataPath+"/Resources/CreateLitJson_basic.json", generatedJsonString.ToString());
 	}
 }
-``
+```
 
 #### Sonderfall Arrays
 ##### LitJson
@@ -123,6 +123,105 @@ public class JSONio06 : MonoBehaviour {
 
 
 # Networking
+
+Für moderne Computerspiele wird heute häufig ein Online-Server-Backend angelegt. Dafür sprechen einige Gründe, unter anderen:
+
+- Multiplayer-Games werden ermöglicht: Die teilnehmenden Spieler (Clients) kommunizieren über einen Server und können gegeneinander spielen. Für das zeitgleiche Spielen ist GravityHunter allerdings nicht konzipiert. Jedoch können Highscores verglichen werden.
+- Mit Player-Accounts können die Spieler das Spiel unterbrechen und an einem anderen Gerät oder auf einer Website weiterspielen
+- Liegen die Config-Dateien, die die Levels spezifizieren, auf dem Server, können von den Entwicklern Updates (z. B. neue Spiellevels)  erstellt und via JSON-Packages an die Clients verteilt werden, ohne dass das Spiel neu installiert werden muss
+- Datenbankabfragen sind im Vergleich zum reinen Parsen von JSON-formatierten Strings effizienter. Datenbanken im Allgemeinen einen Webserver. Zwar kann dies auch ein lokaler Webserver auf dem mobilen Endgerät sein (z. B. SQLite), jedoch zeichnet sich die Dokumentendatenbank MongoDB durch die Möglichkeit aus, mehrdimensionale, JSON-formatierte Objekte unverändert zu speichern. Bei relationalen Datenbanken (SQL) können mehrdimensionale 1:N-Beziehungen nur über zusätzliche Zwischentabellen realisiert werden.
+
+GravityHunter verfügt über einen virtuellen Linux-Server (Debian 8.3), der über [gravityhunter.mi.hdm-stuttgart.de](http://gravityhunter.mi.hdm-stuttgart.de)erreichbar ist.
+Er hat folgende Funktionen:
+
+- Er hostet die Spieledatenbank
+- Er hastet eine Website, auf der die Spieler Accounts anlegen können und auch das Game spielen können
+
+### Einrichtung des Webservers
+
+Der virtuelle Webserver verfügt das typische UNIX-übliche Dateisystem, wie es auch bei nicht-virtuellen UNIX-basierten Betriebssystemen wie Mac OS X und Linux-Distributionen der Fall ist. In dieses Verzeichnis können beliebige Serverkomponenten installiert werden. In unserem Fall werden Webserver-Tätigkeiten mit Node.js-Paketen bewerkstelligt. Node.js-Applikationen werden mit serverseitigem JavaScript konfiguriert und zeichnen durch ihre asynchrone Arbeitsweise im Singlethread sowie durch ihre Vielfalt an Möglichkeiten dank ihres stark modularen Aufbaus aus.
+Folgender Abschnitt beschreibt die Installation eines einfachen Node.js-Programms auf den virtuellen Webserver via SSH:
+
+#### Zugriff auf den virtuellen Webserver via SSH 
+Zur Erstellung eines virtuellen Webservers benötigt der Server-Admin der HdM (Joachim Kuhn) einen öffentlichen RSA-Schlüssel. Mit PuTTy (Windows) bzw. Terminal (Mac OS X) kann ein Schlüsselpaar, bestehend aus dem bereits erwähnten öffentlichen Schlüssel und einem geheimen Schlüssel (gravityhunter), generiert werden. Eine sehr gute Anleitung für Mac OS X gibt es [hier](https://docs.joyent.com/public-cloud/getting-started/ssh-keys/generating-an-ssh-key-manually/manually-generating-your-ssh-key-in-mac-os-x). Der öffentliche Schlüssel wird standardgemäß hier abgelegt: /Users/Fabi/.ssh/id_rsa.pub. Mit Hilfe des privaten Schlüssels und mit einem offenen VPN-Tunnel kann von einem beliebigen Standort via SSH auf den virtuellen Server zugegriffen werden. Dazu muss im Terminal-Programm folgender Befehl eingegeben werden: ```ssh -l root -i .ssh/id_rsa gravityhunter.mi.hdm-stuttgart.de```
+
+#### Installation von Node.js
+Mit den Befehlen ```sudo apt-get install nodejs``` und ```sudo apt-get install npm```werden Node.js und der Node Package Manager installiert. Mit ```sudo ln -s /usr/bin/nodejs /usr/bin/node```wird ein Systemlink erstellt, sodass Node.js-Programme künftig mit dem Befehl ```node```gestartet werden können. 
+Zu Testzwecken wird eine simple Node.js-Applikation erstellt, bestehend aus den Dateien ```app.js``` und ``test.html```.
+Zunächst wird ein neues Verzeichnis erstellt: ```mkdir /root/helloworld```. Hier werden die beiden Dateien erstellt:
+```
+nano app.js
+```
+```
+var express = require('express');
+var app = express();
+
+app.get('/', function(req, res){
+  res.sendfile('test.html');
+});
+app.use(express.static(__dirname + '/public'));
+app.listen(80, function(){
+  console.log('listening on port 80');
+});
+```
+
+```
+nano test.html
+```
+```
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>GravityHunter</title>
+</head>
+<body>
+<h>Hello World</h>
+</body>
+</html>
+```
+Die Aplikation ```àpp.js``` stellt ```test.html``` auf dem Standardport 80 bereit. Sie wird aus dem aktuellen Verzeichnis mit ```node app.js```gestartet.
+Dann wird mit ```npm install --save express``` das benötigte Package expressjs in den Unterordner ```node-modules``` installiert.
+Auf [gravityhunter.mi.hdm-stuttgart.de](http://gravityhunter.mi.hdm-stuttgart.de) erscheint der Text ```Hello World```.
+
+Dieser Webserver ist allerdngs noch unbrauchbar, da er mit dem Ende der SSH-Verbindung ebenfalls beendet wird. Das liegt daran, dass dieser Prozess im Vordergrund des Linux-Betriebssystems läuft. Da der Webserver aber auch nach Ende der SSH-Verbindung funktionieren soll, muss für dieses Node.js-Programm ein Background-Prozess erstellt werden.
+
+#### Ausführung des Node.js-Webservers im Hintergrund mit systemd
+
+Mit dem Linux-Programm systemd können beendete Programme automatisch neu gestartet werden. 
+Das im vorigen Schritt geöffnete Programm muss geöffnet bleiben! Die Installation von systemd erfolgt mit [folgenden Befehlen](https://wiki.debian.org/systemd):
+```
+apt-get install systemd
+init=/bin/systemd
+apt-get install systemd-sysv
+```
+Um ```/root/helloworld/app.js```mit systemd zu verbinden, muss mit ```cd /etc/systemd/system``` in dieses Verzeichnis gewechselt werden und mit ```nano nodeserver.service```eine Servicedatei hierfür erstellt.
+```
+[Unit]
+Description=Node.js Example Server
+
+[Service]
+WorkingDirectory=/root/helloworld
+ExecStart=/usr/bin/node app.js
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=nodeserver
+#User=gravityhunter
+#Group=gravityhunter
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Bei ```ExexStart``` muss der genaue Ort von Node.js angegeben werden, der mit ```which node```ermittelt werden kann; hier: ```/usr/bin/node```. Dann folgt die auszuführende Datei ```app.js```.
+Bei ```WorkinDirectory```muss der das Verzeichnis angegeben werden, in dem ```app.js```liegt. Wird das Arbeitsverzeichnis nicht angegeben werden relative Pfade in der ```app.js```nicht funktionieren, somit auch nicht die Datei ```test.html```.
+Dieser Service wird mit dem Befehl ```systemctl enable nodeserver.service```aktiviert und mit ```systemctl start nodeserver.service``` gestartet. Ob die Applikation läuft, kann mit ```systemctl status nodeserver.service```überprüft werden. Logs der Applikation können mit ```journalctl -u nodeserver```eingesehen werden.
+Nun kann die SSH-Verbindung getrennt werden. Dann wird ```app.js```neu gestartet.
+Wenn Änderungen am der Webserver-Applikation vorgenommen werden sollen, muss im Verzeichnis ```/etc/systemd/system```mit dem Befehl ```systemctl start nodeserver.service```der Prozess zunächst beendet werden.
+
+
+
 
 Fußnote gefällig... <sup id="a1">[1](#f1)</sup>
 
