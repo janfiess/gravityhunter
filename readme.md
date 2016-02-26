@@ -218,8 +218,25 @@ Bei ```ExexStart``` muss der genaue Ort von Node.js angegeben werden, der mit ``
 Bei ```WorkingDirectory```muss der das Verzeichnis angegeben werden, in dem ```app.js```liegt. Wird das Arbeitsverzeichnis nicht angegeben werden relative Pfade in der ```app.js```nicht funktionieren, somit auch nicht die Datei ```test.html```.
 Dieser Service wird mit dem Befehl ```systemctl enable nodeserver.service```aktiviert und mit ```systemctl start nodeserver.service``` gestartet. Ob die Applikation läuft, kann mit ```systemctl status nodeserver.service```überprüft werden. Logs der Applikation können mit ```journalctl -u nodeserver```eingesehen werden.
 Nun kann die SSH-Verbindung getrennt werden. Dann wird ```app.js```neu gestartet.
-Wenn Änderungen am der Webserver-Applikation vorgenommen werden sollen, muss im Verzeichnis ```/etc/systemd/system```mit dem Befehl ```systemctl start nodeserver.service```der Prozess zunächst beendet werden.
+Wenn Änderungen am der Webserver-Applikation vorgenommen werden sollen, muss im Verzeichnis ```/etc/systemd/system```mit dem Befehl ```systemctl stop nodeserver.service```der Prozess zunächst beendet werden.
 Hilfreich waren die Posts [1](http://www.axllent.org/docs/view/nodejs-service-with-systemd/) und [2](http://blog.carbonfive.com/2014/06/02/node-js-in-production/).
+
+#### Dateien auf den Server kopieren
+
+Entwickelt wird der Spieleserver auf einem lokalen Server. Die finalen Dateien werden über SSH an den virtuellen Server gesendet, unter Verwendung des Konsolenprogramms scp.
+
+Während die Verbindung zum Server aufrecht ist, muss ein weiteres Terminalfenster geöffnet werden. Hier soll allerdings nicht zum Srver geroutet werden. Der Cursor wird in das Verzeichnis des lokalen Rechners gesetzt, in dem die zu kopierende Datei liegt, z. B. ```cd /Users/Fabi/Desktop```. Die zu kopierende Beispieldatei heißt ```trashlog.txt```. Das Zielverzeichnis des virtuellen Servers lautet ```/root```. Der Kopiervorgang wird mit folgendem Befehl laut [dieser Anleitung](http://www.howtogeek.com/66776/how-to-remotely-copy-files-over-ssh-without-entering-your-password/) ausgeführt:
+```
+scp /Users/Fabi/Desktop/trashlog.txt root@gravityhunter.mi.hdm-stuttgart.de:/root
+```
+Gesamte Verzeichnisse werden mit dem flag ```-r```kopiert:
+```
+scp -r /Users/Fabi/Desktop/sampledirectory root@gravityhunter.mi.hdm-stuttgart.de:/root
+```
+Der Kopiervorgang von der virtuellen Maschine zur lokalen Maschine funktioniert ähnlich:
+```
+scp root@gravityhunter.mi.hdm-stuttgart.de:/root/trashlog.txt /Users/Fabi/Desktop
+```
 
 
 
