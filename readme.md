@@ -139,11 +139,20 @@ Er hat folgende Funktionen:
 
 ### Einrichtung des Webservers
 
-Der virtuelle Webserver verfügt das typische UNIX-übliche Dateisystem, wie es auch bei nicht-virtuellen UNIX-basierten Betriebssystemen wie Mac OS X und Linux-Distributionen der Fall ist. In dieses Verzeichnis können beliebige Serverkomponenten installiert werden. In unserem Fall werden Webserver-Tätigkeiten mit Node.js-Paketen bewerkstelligt. Node.js-Applikationen werden mit serverseitigem JavaScript konfiguriert und zeichnen durch ihre asynchrone Arbeitsweise im Singlethread sowie durch ihre Vielfalt an Möglichkeiten dank ihres stark modularen Aufbaus aus.
+Der virtuelle Server hat das typische UNIX-übliche Dateisystem, wie es auch bei nicht-virtuellen UNIX-basierten Betriebssystemen wie Mac OS X und Linux-Distributionen der Fall ist. In dieses Verzeichnis können beliebige Serverkomponenten installiert werden. In unserem Fall werden Webserver-Tätigkeiten mit Node.js-Paketen bewerkstelligt. Node.js-Applikationen werden mit serverseitigem JavaScript konfiguriert und zeichnen durch ihre asynchrone Arbeitsweise im Singlethread sowie durch ihre Vielfalt an Möglichkeiten dank ihres stark modularen Aufbaus aus.
 Folgender Abschnitt beschreibt die Installation eines einfachen Node.js-Programms auf den virtuellen Webserver via SSH:
 
-#### Zugriff auf den virtuellen Webserver via SSH 
-Zur Erstellung eines virtuellen Webservers benötigt der Server-Admin der HdM (Joachim Kuhn) einen öffentlichen RSA-Schlüssel. Mit PuTTy (Windows) bzw. Terminal (Mac OS X) kann ein Schlüsselpaar, bestehend aus dem bereits erwähnten öffentlichen Schlüssel und einem geheimen Schlüssel (gravityhunter), generiert werden. Eine sehr gute Anleitung für Mac OS X gibt es [hier](https://docs.joyent.com/public-cloud/getting-started/ssh-keys/generating-an-ssh-key-manually/manually-generating-your-ssh-key-in-mac-os-x). Der öffentliche Schlüssel wird standardgemäß hier abgelegt: /Users/Fabi/.ssh/id_rsa.pub. Mit Hilfe des privaten Schlüssels und mit einem offenen VPN-Tunnel kann von einem beliebigen Standort via SSH auf den virtuellen Server zugegriffen werden. Dazu muss im Terminal-Programm folgender Befehl eingegeben werden: ```ssh -l root -i .ssh/id_rsa gravityhunter.mi.hdm-stuttgart.de```
+#### Zugriff auf den virtuellen Server via SSH 
+Zur Erstellung eines virtuellen Servers benötigt der Server-Admin der HdM (Joachim Kuhn) einen öffentlichen RSA-Schlüssel. Mit PuTTy (Windows) bzw. Terminal (Mac OS X) kann ein Schlüsselpaar, bestehend aus dem bereits erwähnten öffentlichen Schlüssel und einem geheimen Schlüssel (gravityhunter), generiert werden. Eine sehr gute Anleitung für Mac OS X gibt es [hier](https://docs.joyent.com/public-cloud/getting-started/ssh-keys/generating-an-ssh-key-manually/manually-generating-your-ssh-key-in-mac-os-x). Der öffentliche Schlüssel wird standardgemäß hier abgelegt: /Users/Fabi/.ssh/id_rsa.pub. Mit Hilfe des privaten Schlüssels und mit einem offenen VPN-Tunnel kann von einem beliebigen Standort via SSH auf den virtuellen Server zugegriffen werden. Dazu muss im Terminal-Programm folgender Befehl eingegeben werden: 
+```
+ssh -l root -i .ssh/id_rsa gravityhunter.mi.hdm-stuttgart.de
+```
+Bei der ersten Anmeldung wird der Passphrase abgefragt: ```gravityhunter```.
+
+Vereinfacht funktioniert auch folgender Befehl zur Verbindung zum Server:
+```
+ssh root@gravityhunter.mi.hdm-stuttgart.de
+```
 
 #### Installation von Node.js
 Mit den Befehlen ```sudo apt-get install nodejs``` und ```sudo apt-get install npm```werden Node.js und der Node Package Manager installiert. Mit ```sudo ln -s /usr/bin/nodejs /usr/bin/node```wird ein Systemlink erstellt, sodass Node.js-Programme künftig mit dem Befehl ```node```gestartet werden können. 
