@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - 5.0
+sudo: false
+branches:
+  only:
+    - master
+    - develop
+script: "npm test"

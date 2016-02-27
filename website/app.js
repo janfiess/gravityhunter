@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var MongoClient = require('mongodb').MongoClient;
+var mongo_express = require('./dbtool/mongo-express/app.js');
 
 // include external data, eg. css, images (public folder)
 app.use(express.static(__dirname + '/public'));

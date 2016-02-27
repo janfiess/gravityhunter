@@ -1,0 +1,16 @@
+.documentlist {
+  height: 100px;
+  overflow: auto;
+}
+
+.documentlist:hover {
+  cursor: pointer;
+  background: #EEE;
+}
+
+.tableWrapper {
+  /*overflow: scroll;*/
+  width: 100%;
+  display: table;
+  cursor: pointer;
+}
