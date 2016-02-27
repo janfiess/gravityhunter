@@ -1,0 +1,26 @@
+body{
+    /*background-color: #ffe87c;*/
+}
+
+.sidepic{
+    position: fixed;
+}
+
+.maincontent{
+    padding-left:30px;
+    padding-right:30px;
+    padding-top: 44px;
+}
+
+.footer{
+    background-color: #000000;
+    color: #aaaaaa;
+    margin-top:70px;
+
+}
+.footer_content{
+    margin:30px;
+}
+img{
+    max-width: 300%;
+}
