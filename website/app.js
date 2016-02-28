@@ -13,6 +13,11 @@ app.get('/', function (req, res) {
     res.redirect('/html/index.html'); // alternative: res.sendfile('./public/html/index.html');
 });
 
+app.get('/mongo', function (req, res) {
+    res.redirect('./dbtool/mongo-express/views/index.html'); // alternative: res.sendfile('./public/html/index.html');
+});
+
+
 
 // Put the application on port 3000
 var port = 3000;

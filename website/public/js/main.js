@@ -1,5 +1,5 @@
 /**
- * play.html
+ * test.html
  */
 
 // insert sample data
@@ -14,6 +14,23 @@ $('#input_button').unbind().click(function () {
     console.log(data);
     socket.emit("testplayer",data);
 });
+
+
+/**
+ * signup.html
+ */
+
+$('#signup_button').unbind().click(function () {
+    var data = {
+        email: $('#input_email').val(),
+        name: $('#input_name').val(),
+        scores: $('#input_scores').val(),
+        level: $('#input_level').val()
+    }
+    console.log(data);
+    //socket.emit("testplayer",data);
+});
+
 
 /**
  * highscore.html
