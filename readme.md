@@ -247,6 +247,29 @@ Der Kopiervorgang von der virtuellen Maschine zur lokalen Maschine funktioniert 
 scp root@gravityhunter.mi.hdm-stuttgart.de:/root/trashlog.txt /Users/Fabi/Desktop
 ```
 
+#### Dateien von Git kopieren
+
+Die ebsite wird auf dem lokalen Rechner in einer konfortablen Entwicklungsumgebung entwickelt und getestet, Da das manuelle Aktualisieren des Projektverzeichnisses auf den virtuellen Linux-Server sehr aufwändig und langwierig ist, und immer nur einzelne Dateien geändert werden, bietet es sich an das auf dem lokalen Webserver getestete Verzeichnis auf einem Online-Repository mit Versionskontrolle, wie Github abzulegen. Mit einem einzigen Linux-Befehl auf dem virtuellen Server wird dort dann das Repository aktualisiert.
+
+Ein gutes Github-Tutorial gibt es [hier](#).
+Meine persönliche Schritt-für-Schritt-Einrichtung auf dem Debian-Server (kein ```sudo```, da ich als User ```root``` eingeloggt bin:
+```
+apt-get install git
+```
+Dann muss zu dem Directory geroutet werden, in das später das Git-Repository kopiert werden soll. Dort wird dann git initialisiert und das Repository gecloned, das auf [https://github.com/fabifiess/gravityhunter](https://github.com/fabifiess/gravityhunter) liegt.
+
+```
+cd helloworld
+git init
+git clone https://github.com/fabifiess/gravityhunter
+```
+
+Damit sollte das Repository in das Verzeichnis helloworld kopiert werden.
+Wenn das Repository auf github aktualisiert wurde, kann die aktuelle Version folgendermaßen heruntergeladen werden
+```
+cd /root/helloworld
+git pull https://github.com/fabifiess/gravityhunter
+```
 
 
 
