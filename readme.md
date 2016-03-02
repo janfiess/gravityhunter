@@ -251,7 +251,7 @@ scp root@gravityhunter.mi.hdm-stuttgart.de:/root/trashlog.txt /Users/Fabi/Deskto
 
 Die ebsite wird auf dem lokalen Rechner in einer konfortablen Entwicklungsumgebung entwickelt und getestet, Da das manuelle Aktualisieren des Projektverzeichnisses auf den virtuellen Linux-Server sehr aufwändig und langwierig ist, und immer nur einzelne Dateien geändert werden, bietet es sich an das auf dem lokalen Webserver getestete Verzeichnis auf einem Online-Repository mit Versionskontrolle, wie Github abzulegen. Mit einem einzigen Linux-Befehl auf dem virtuellen Server wird dort dann das Repository aktualisiert.
 
-Ein gutes Github-Tutorial gibt es [hier](#).
+Ein gutes Github-Tutorial gibt es [hier](https://help.github.com/articles/fetching-a-remote/).
 Meine persönliche Schritt-für-Schritt-Einrichtung auf dem Debian-Server (kein ```sudo```, da ich als User ```root``` eingeloggt bin:
 ```
 apt-get install git
@@ -261,15 +261,63 @@ Dann muss zu dem Directory geroutet werden, in das später das Git-Repository ko
 ```
 cd helloworld
 git init
-git clone https://github.com/fabifiess/gravityhunter
+git clone https://github.com/fabifiess/gravityhunter.git
 ```
 
-Damit sollte das Repository in das Verzeichnis helloworld kopiert werden.
+Dur Veranschaulichun des dritten Befehls: ```git clone [URL].git```. Damit sollte das Repository in das Verzeichnis helloworld kopiert werden.
 Wenn das Repository auf github aktualisiert wurde, kann die aktuelle Version folgendermaßen heruntergeladen werden
 ```
 cd /root/helloworld
-git pull https://github.com/fabifiess/gravityhunter
+git fetch gravityhunter
 ```
+
+### Datenbank MongoDB einrichten
+
+Die für MongoDB benötigten Package können folegndermaßen installiert werden:
+```
+apt-get install mongodb
+```
+Dabei handelt es sich zum StandMärz 2016 um die Version 2.4.1. Derzeit ist jedoch bereits 3.2.
+Grundsätzlich funktioniert Version 2.4 sehr gut. Jedoch kam es in meinem Fall zu einem Sicherheitsrisiko auf dem Hochschulserver, weshalb meine virtuelle Debian-Machine abgeschaltet werden musste (Port 27017 wurde für direkten Datenbankzugriff mit Unity3D geforwarded). Ich wurde dazu aufgefordert, die Datenbank mit einem Passwort zu sichern. Mit der Version 2.4 ist das allerdings nicht möglich. Diese Funktion ist erst ab Version 2.6 verfügbar.
+Wenn eine aktuelle MongoDB-Version für Debian installiert werden soll, dürfen die Package Manager apt-get oder aptitude nicht verwendet werden. Die alternative Installation wird in der [MongoDB-Dokumentation](https://docs.mongodb.org/master/tutorial/install-mongodb-on-debian/) beschrieben.
+Anbei die Befehle, die auf Debian 8.3 funktionierten:
+```
+echo "deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.2 main" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.2 main
+```
+Dann apt-get-Liste updaten:
+```
+apt-get update
+```
+Dann schließlich kann die Community-Version von MongoDB geladen und installiert werden:
+```
+apt-get install mongodb-org
+```
+Eine Liste aller installierten Programme ist einsehbar unter 
+```
+dpkg --get-selections
+```
+MongoDB wird mit diesem Befehl gestartet:
+```
+service mongod start
+```
+Bei Vresion 2.4.1 lautet dieser Befehl ```service mongodb start```
+
+Die MongoDB-Shell wird mit ```mongo```gestartet und mit ```quit()```oder mit der Tastenkombination ```CTRL + C```beendet.
+Zum Umgang mit MongoDB-Commands auf der Konsole empfehle ich [diese PDF](http://www.tutorialspoint.com/mongodb/mongodb_tutorial.pdf).
+
+User Name und Password werden folgendermaßen eingerichtet:
+
+```
+use test
+db.createUser(
+{
+	user: "gravityhunter",
+	pwd: "gravityhunter",
+	roles: [ { role: "userAdmin", db: "test" } ]
+})
+```
+
 
 
 
