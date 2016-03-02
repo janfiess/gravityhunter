@@ -13,8 +13,8 @@ app.get('/', function (req, res) {
     res.redirect('/html/index.html'); // alternative: res.sendfile('./public/html/index.html');
 });
 
-app.get('/mongo', function (req, res) {
-    res.redirect('./dbtool/mongo-express/views/index.html'); // alternative: res.sendfile('./public/html/index.html');
+app.get('/signup', function (req, res) {
+    res.redirect('/html/signup.html');
 });
 
 
@@ -32,10 +32,25 @@ var mongo_url = 'mongodb://localhost:27017/test';
 
 // Socket.io: Communication Server <-> Client(s)
 io.on('connection', function (socket) {
+
     socket.on("testplayer", function (data) {
         console.log(data);
         MongoClient.connect(mongo_url, function (err, db) {
             console.log("Connected to DB: add testplayer");
+            insertPlayer(db, data, function () {                       // 1. INSERT
+                selectPlayer(db, function () {                   // SELECT
+                    db.close();
+                });
+            });
+        });
+    });
+
+    socket.on("signup", function (data) {
+        data.timestamp= new Date(Date.now());
+        console.log("Signup: ");
+        console.log(data);
+        MongoClient.connect(mongo_url, function (err, db) {
+            console.log("Connected to DB: add player from signup form");
             insertPlayer(db, data, function () {                       // 1. INSERT
                 selectPlayer(db, function () {                   // SELECT
                     db.close();
