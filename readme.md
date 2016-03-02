@@ -268,7 +268,7 @@ Dur Veranschaulichun des dritten Befehls: ```git clone [URL].git```. Damit sollt
 Wenn das Repository auf github aktualisiert wurde, kann die aktuelle Version folgendermaßen heruntergeladen werden
 ```
 cd /root/helloworld
-git fetch gravityhunter
+git clone https://github.com/fabifiess/gravityhunter.git
 ```
 
 ### Datenbank MongoDB einrichten
